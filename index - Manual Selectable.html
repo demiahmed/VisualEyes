@@ -1,0 +1,106 @@
+<html>
+<head>
+  <title>Visual_Eyes Project I </title>
+  <link rel = "stylesheet" href="styles.css">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="World.json"></script>
+  <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+</head>
+<body>
+ <h1 contenteditable="true"> <center>Countries with a High Speed Rail System</center></h1>
+ <p><center>@_visual_eyes_</center></p>
+ <script>
+ 
+var a = ['South Korea','Norway','Sweden','Hong Kong','Switzerland','Finland','Singapore','Japan','Denmark','United States','Netherlands','Romania','Czech Republic','United Kingdom','Taiwan','Latvia','Belgium','Canada','Thailand','Ireland','Bulgaria','Spain','Germany','Hungary','New Zealand','Lithuania','Austria','Qatar','Israel','Slovenia','Slovakia','Portugal','Malta','Poland','Kenya','Russia','Luxembourg','Estonia','Australia','France','Uruguay','Vietnam','Chile','Italy','Malaysia','Croatia','United Arab Emirates','Sri Lanka','Kuwait','Greece','China','Turkey','Mexico','Indonesia','World','Cyprus','Brazil','South Africa','Saudi Arabia','India','Argentina','Peru','Ecuador','Panama','Colombia','Philippines','Morocco','Iran','Costa Rica','Nigeria','Namibia','Bolivia','Egypt','Venezuela','Paraguay'];
+
+//import { feature } from 'topojson';
+    var width = 1600,
+    height = 960;
+
+var svg = d3.select( "body" )
+  .append( "svg" )
+  .attr( "width", width )
+  .attr( "height", height );
+
+var g = svg.append( "g" );
+
+svg.call(d3.zoom().scaleExtent([1,8]).on('zoom', () => {
+    g.attr('transform', d3.event.transform)
+}));
+
+var colorScale = d3.scaleOrdinal(d3.schemeAccent);
+
+
+
+var projection = d3.geoCylindricalStereographic()
+  .scale( 200 )
+  .rotate( [0,0] )
+  .center( [0,-height/30] )
+  .translate( [width/2,height/2] );
+
+var genPath = d3.geoPath()
+    .projection( projection );
+
+ //   svg.append('path')
+   // .attr('class', 'sphere')
+    //.attr('d' , genPath({type:"Sphere"}));
+//console.log(worldmap.features)
+// Failed Sphere Bounding Box
+var colorValue = d => colorScale(d.properties.name_len);
+
+
+
+colorScale
+    .domain(worldmap.features.map(colorValue))
+    .domain(colorScale.domain().sort())
+    //.range(d3.schemeSpectral[d3.colorScale])
+    ;
+
+
+g.selectAll( 'path' )
+  .data( worldmap.features )
+  .enter()
+  .append( 'path' )
+  .attr( 'd', genPath)
+  .attr('class', 'selectable-countries')
+  .on('click', function(d){
+     d3.select(this).classed('countries',d3.select(this).classed('countries') ? false : true)
+  })
+  .on('dblclick', function(d){
+     d3.select(this).classed('countries-dbl',d3.select(this).classed('countries-dbl') ? false : true)
+  })
+
+    .append('title')
+        .text(d => d.properties.name + ': ' + d.properties.name_len);
+
+
+var u=0;
+var countries =[];
+for (var i = 0; i< a.length ; i++){
+  for(var j = 0; j<worldmap.features.length; j++){
+    if(a[i] == worldmap.features[j].properties.name)
+      u+=1;
+  }
+}
+
+console.log(u);
+g.selectAll('path')
+  .data(worldmap.features)
+  .enter()
+  .append('path')
+  .attr('d', genPath)
+  .attr('fill', 'red')
+  ;
+
+
+
+
+      
+
+    
+
+  
+ </script>
+ 
+</body>
+</html>
